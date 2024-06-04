@@ -1,6 +1,7 @@
 package application.controller;
 
 import application.dto.LoginDto;
+import application.dto.TokenDto;
 import application.dto.UserRegisterDto;
 import application.entity.User;
 import application.exception.NoRoleException;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,5 +50,15 @@ public class AuthController{
         Authentication auth = daoAuthenticationProvider.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(loginDto.getUsername(), loginDto.getPassword()));
 
         return ResponseEntity.ok(tokenGenerator.createToken(auth));
+    }
+
+
+    @PostMapping("/token")
+    public ResponseEntity token(@RequestBody TokenDto tokenDto) {
+        Authentication authentication = refreshTokenAuthProvider.authenticate(new BearerTokenAuthenticationToken(tokenDto.getRefreshToken()));
+//        Jwt jwt = (Jwt) authentication.getCredentials();
+        // check if present in db and not revoked, etc
+
+        return ResponseEntity.ok(tokenGenerator.createToken(authentication));
     }
 }
