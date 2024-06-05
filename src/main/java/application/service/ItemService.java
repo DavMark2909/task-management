@@ -10,7 +10,9 @@ import application.repository.ItemTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
@@ -53,7 +55,11 @@ public class ItemService {
         itemTypeRepository.save(itemType);
     }
 
-    public void getItems(String type){
-
+    public List<ItemDto> getItems(String type){
+        if (type == "all") {
+            List<Item> all = itemRepository.findAll();
+            return all.stream().map(ItemConverter::from).collect(Collectors.toList());
+        }
+        return itemRepository.findAllByType(type).stream().map(ItemConverter::from).collect(Collectors.toList());
     }
 }
