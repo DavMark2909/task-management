@@ -1,9 +1,8 @@
 package application.controller;
 
-import application.dto.LoginDto;
-import application.dto.TokenDto;
-import application.dto.UserRegisterDto;
-import application.entity.User;
+import application.dto.auth.LoginDto;
+import application.dto.auth.TokenDto;
+import application.dto.auth.UserRegisterDto;
 import application.exception.NoRoleException;
 import application.exception.UserAlreadyExistsException;
 import application.security.SecurityUser;
