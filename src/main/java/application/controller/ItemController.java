@@ -7,6 +7,7 @@ import application.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,11 +19,13 @@ public class ItemController {
     ItemService itemService;
 
     @PostMapping("/createItem")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity createItem(@RequestBody CreateItemDto dto) throws MyException {
         return ResponseEntity.ok(itemService.createItem(dto));
     }
 
     @PostMapping("/createType")
+    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Void> createType(@RequestBody CreateTypeDto dto) throws MyException {
         itemService.createType(dto);
         return new ResponseEntity<>(HttpStatus.CREATED);

@@ -1,5 +1,8 @@
-package application.entity;
+package application.entity.task;
 
+import application.entity.User;
+import application.entity.task.TaskComment;
+import application.entity.task.TaskStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +11,7 @@ import lombok.Setter;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -29,11 +32,21 @@ public class Task {
     private LocalDateTime dueTime;
 
     @ManyToOne
+    @JoinColumn(name = "status_id")
+    private TaskStatus status;
+
+    private boolean personal;
+
+    @OneToMany(mappedBy = "task")
+    private Set<TaskComment> comments;
+
+
+    @ManyToOne
     @JoinColumn(name = "issuer_id", nullable = false)
     private User issuer;
 
     @ManyToMany(mappedBy = "tasks")
-    private List<User> receivers;
+    private Set<User> receivers;
 
     @ManyToOne
     @JoinColumn(name = "performer_id")
