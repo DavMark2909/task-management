@@ -1,7 +1,9 @@
 package application.dto.task;
 
+import application.dto.request.TaskCommentDto;
 import application.dto.user.TaskUserDto;
 import application.entity.task.Task;
+import application.entity.task.TaskComment;
 
 import java.util.List;
 
@@ -24,6 +26,11 @@ public class Converter {
                 .id(task.getId())
                 .receivers(taskUserDtos)
                 .personal(task.isPersonal())
+                .build();
+    }
+
+    public static CommentsDto convertToCommentsDto(TaskComment comment){
+        return CommentsDto.builder().content(comment.getComment()).issuer(comment.getCommentator())
                 .build();
     }
 }

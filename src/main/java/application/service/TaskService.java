@@ -10,6 +10,7 @@ import application.entity.request.RequestComment;
 import application.entity.request.RequestStatus;
 import application.entity.request.RequestType;
 import application.entity.task.Task;
+import application.entity.task.TaskComment;
 import application.entity.task.TaskStatus;
 import application.exception.MyException;
 import application.repository.*;
@@ -136,14 +137,45 @@ public class TaskService {
         return requestRepository.save(request);
     }
 
+    public void createRequestComment(String username, TaskCommentDto dto) {
+        User issuer = userService.getRealUserByUsername(username);
+        User receiver = userService.getRealUserByUsername(dto.getReceiver());
+        Request request = new Request();
+        request.setName("Task comment");
+        request.setReceivers(Set.of(receiver));
+        request.setIssuer(issuer);
+        request.setDescription(String.valueOf(dto.getTaskId()));
+        RequestStatus status = requestStatusRepository.findByName("Active").orElseGet(() -> {
+            RequestStatus s = new RequestStatus();
+            s.setName("Active");
+            return requestStatusRepository.save(s);
+        });
+        RequestType type = requestTypeRepository.findByName("Comment").orElseGet(() -> {
+            RequestType t = new RequestType();
+            t.setName("Comment");
+            return requestTypeRepository.save(t);
+        });
+        request.setStatus(status);
+        request.setType(type);
+        requestRepository.save(request);
+    }
+
     public void createRequest(String username, RequestDto dto){
         User issuer = userService.getRealUserByUsername(username);
         Request request = new Request();
         request.setName(dto.getName());
-        request.setDescription(dto.getSuggestion());
+        request.setDescription(dto.getDescription());
         request.setIssuer(issuer);
-        RequestStatus status = requestStatusRepository.findByName("active");
-        RequestType type = requestTypeRepository.findByName(dto.getType());
+        RequestStatus status = requestStatusRepository.findByName("Active").orElseGet(() -> {
+            RequestStatus s = new RequestStatus();
+            s.setName("Active");
+            return requestStatusRepository.save(s);
+        });
+        RequestType type = requestTypeRepository.findByName("Comment").orElseGet(() -> {
+            RequestType t = new RequestType();
+            t.setName("Comment");
+            return requestTypeRepository.save(t);
+        });
         request.setType(type);
         request.setStatus(status);
         Request saved = saveRequest(request);
@@ -186,7 +218,11 @@ public class TaskService {
 
     public Request updateRequest(int id, String newState){
         Request request = requestRepository.findById(id).orElseThrow();
-        RequestStatus status = requestStatusRepository.findByName(newState);
+        RequestStatus status = requestStatusRepository.findByName(newState).orElseGet(() -> {
+            RequestStatus s = new RequestStatus();
+            s.setName(newState);
+            return requestStatusRepository.save(s);
+        });
         request.setStatus(status);
         return requestRepository.save(request);
     }
@@ -217,4 +253,9 @@ public class TaskService {
     }
 
 
+    public List<CommentsDto> getTaskComment(int id) {
+        Task task = taskRepository.findTaskById(id).orElseThrow();
+        Set<TaskComment> comments = task.getComments();
+        return comments.stream().map(Converter::convertToCommentsDto).toList();
+    }
 }

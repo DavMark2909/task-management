@@ -2,6 +2,7 @@ package application.controller;
 
 import application.dto.request.IssuedRequestsDto;
 import application.dto.request.RequestDto;
+import application.dto.request.TaskCommentDto;
 import application.dto.request.UserRequestsDto;
 import application.dto.task.*;
 import application.exception.MyException;
@@ -52,8 +53,15 @@ public class TaskController {
         return ResponseEntity.ok("Updated");
     }
 
+//    adds a comment to the task
+    @PostMapping("/request-comment")
+    public ResponseEntity<String> createTaskComment(Authentication auth, @RequestBody TaskCommentDto dto){
+        taskService.createRequestComment(auth.getName(), dto);
+        return ResponseEntity.ok("Created");
+    }
+
     @PostMapping("/request")
-    public ResponseEntity<String> createRequest(Authentication auth, RequestDto dto){
+    public ResponseEntity<String> createRequest(Authentication auth, @RequestBody RequestDto dto){
         taskService.createRequest(auth.getName(), dto);
         return ResponseEntity.ok("Created");
     }
@@ -66,6 +74,11 @@ public class TaskController {
     @GetMapping("/my-requests")
     public ResponseEntity<List<IssuedRequestsDto>> getMyRequests(Authentication auth){
         return ResponseEntity.ok(taskService.getIssuedRequests(auth.getName()));
+    }
+
+    @GetMapping("/comments")
+    public ResponseEntity<List<CommentsDto>> getTaskComments(@RequestBody TaskCommentsDto dto){
+        return ResponseEntity.ok(taskService.getTaskComment(dto.getId()));
     }
 
 
