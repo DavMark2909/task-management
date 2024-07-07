@@ -9,4 +9,5 @@ public class PersonalTaskDto {
     private int id;
     private String name, description, priority, startDate, endDate;
     private String issuer;
+    private String status;
 }

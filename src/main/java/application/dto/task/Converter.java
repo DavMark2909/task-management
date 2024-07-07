@@ -13,6 +13,7 @@ public class Converter {
         return PersonalTaskDto.builder().name(task.getTitle()).description(task.getDescription()).priority(task.getPriority())
                 .issuer(task.getIssuer().getUsername()).id(task.getId())
                 .startDate(task.getIssuedTime().toString()).endDate(task.getDueTime().toString())
+                .status(task.getStatus().getName())
                 .build();
     }
 
