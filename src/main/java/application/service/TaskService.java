@@ -258,4 +258,23 @@ public class TaskService {
         Set<TaskComment> comments = task.getComments();
         return comments.stream().map(Converter::convertToCommentsDto).toList();
     }
+
+    public void completeTask(int id, String name) {
+        User user = userService.getRealUserByUsername(name);
+        Task task = taskRepository.findTaskById(id).orElseThrow();
+        task.setPerformer(user);
+        task.setStatus(taskStatusRepository.findByName("Closed").orElseGet(() -> {
+            TaskStatus status = new TaskStatus();
+            status.setName("Closed");
+            return taskStatusRepository.save(status);
+        }));
+        Set<Task> completedTasks = user.getCompletedTasks();
+        completedTasks.add(taskRepository.save(task));
+        userService.saveUser(user);
+    }
+
+    public List<PersonalTaskDto> myCompletedTasks(String name) {
+        User user = userService.getRealUserByUsername(name);
+        return user.getCompletedTasks().stream().map(Converter::convertToPersonalTaskDto).toList();
+    }
 }

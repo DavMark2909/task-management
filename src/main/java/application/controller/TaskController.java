@@ -81,5 +81,16 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTaskComment(dto.getId()));
     }
 
+    @PostMapping("/complete")
+    public ResponseEntity<String> completeTask(@RequestParam(name = "id") int id, Authentication auth){
+        taskService.completeTask(id, auth.getName());
+        return ResponseEntity.ok("Completed");
+    }
+
+    @GetMapping("/my-completed")
+    public ResponseEntity<List<PersonalTaskDto>> myCompletedTasks(Authentication auth){
+        return ResponseEntity.ok(taskService.myCompletedTasks(auth.getName()));
+    }
+
 
 }
