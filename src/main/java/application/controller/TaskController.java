@@ -77,8 +77,8 @@ public class TaskController {
     }
 
     @GetMapping("/comments")
-    public ResponseEntity<List<CommentsDto>> getTaskComments(@RequestBody TaskCommentsDto dto){
-        return ResponseEntity.ok(taskService.getTaskComment(dto.getId()));
+    public ResponseEntity<List<CommentsDto>> getTaskComments(@RequestParam int id){
+        return ResponseEntity.ok(taskService.getTaskComment(id));
     }
 
     @PostMapping("/complete")
@@ -90,6 +90,12 @@ public class TaskController {
     @GetMapping("/my-completed")
     public ResponseEntity<List<PersonalTaskDto>> myCompletedTasks(Authentication auth){
         return ResponseEntity.ok(taskService.myCompletedTasks(auth.getName()));
+    }
+
+    @PostMapping("/add-comment")
+    public ResponseEntity<String> addComment(@RequestParam int id, Authentication auth, @RequestBody CreateTaskCommentDto dto){
+        taskService.createTaskComment(id, auth.getName(), dto.getComment());
+        return ResponseEntity.ok("Created");
     }
 
 

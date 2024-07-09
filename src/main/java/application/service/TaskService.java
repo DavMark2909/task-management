@@ -36,6 +36,7 @@ public class TaskService {
     private RequestRepository requestRepository;
     private TaskStatusRepository taskStatusRepository;
     private MessageService messageService;
+    private TaskCommentRepository taskCommentRepository;
 
     public List<String> getAllRoles(){
         return roleService.getAllRoles();
@@ -276,5 +277,18 @@ public class TaskService {
     public List<PersonalTaskDto> myCompletedTasks(String name) {
         User user = userService.getRealUserByUsername(name);
         return user.getCompletedTasks().stream().map(Converter::convertToPersonalTaskDto).toList();
+    }
+
+    public void createTaskComment(int taskId, String username, String com) {
+        Task task = taskRepository.findTaskById(taskId).orElseThrow();
+        TaskComment comment = new TaskComment();
+        comment.setComment(com);
+        comment.setCommentator(username);
+        comment.setTask(task);
+        TaskComment saved = taskCommentRepository.save(comment);
+        Set<TaskComment> comments = task.getComments();
+        comments.add(saved);
+        //create a future call that will create a system call to the issuer of the task
+        taskRepository.save(task);
     }
 }

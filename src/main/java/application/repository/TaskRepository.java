@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Integer> {
 
-    Optional<Task> findTaskById(Integer id);
+    Optional<Task> findTaskById(int id);
 
     @Query("SELECT t FROM Task t WHERE t.issuer.username = :username")
     List<Task> findTasksByIssuerUsername(@Param("username") String username);
