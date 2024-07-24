@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/item")
@@ -17,6 +19,11 @@ public class ItemController {
 
     @Autowired
     ItemService itemService;
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getCategories(){
+        return ResponseEntity.ok(itemService.getAllCategories());
+    }
 
     @PostMapping("/createItem")
     @PreAuthorize("hasAuthority('admin')")

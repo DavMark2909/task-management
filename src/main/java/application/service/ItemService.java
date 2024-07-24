@@ -23,6 +23,11 @@ public class ItemService {
     @Autowired
     ItemTypeRepository itemTypeRepository;
 
+    public List<String> getAllCategories(){
+        return itemTypeRepository.getAllCategories()
+                .stream().map(category -> category.getName()).toList();
+    }
+
     public ItemDto createItem(CreateItemDto dto) throws MyException {
         Optional<Item> byName = itemRepository.findByName(dto.getName());
         if (byName.isPresent())
