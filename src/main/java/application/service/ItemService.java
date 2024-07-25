@@ -24,8 +24,7 @@ public class ItemService {
     ItemTypeRepository itemTypeRepository;
 
     public List<String> getAllCategories(){
-        return itemTypeRepository.getAllCategories()
-                .stream().map(category -> category.getName()).toList();
+        return itemTypeRepository.getAllCategories();
     }
 
     public ItemDto createItem(CreateItemDto dto) throws MyException {
@@ -38,6 +37,7 @@ public class ItemService {
         Item item = new Item();
         item.setName(dto.getName());
         item.setType(type.get());
+        item.setPrice(dto.getPrice());
         return ItemConverter.from(itemRepository.save(item));
     }
 

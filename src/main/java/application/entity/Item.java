@@ -19,6 +19,8 @@ public class Item {
 
     private String name;
 
+    private double price;
+
     @ManyToOne
     @JoinColumn(name = "type_id", nullable = false)
     private ItemType type;

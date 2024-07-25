@@ -11,5 +11,5 @@ public interface ItemTypeRepository extends JpaRepository<ItemType, Integer> {
     Optional<ItemType> findByName(String name);
 
     @Query("SELECT DISTINCT type.name from ItemType type")
-    List<ItemType> getAllCategories();
+    List<String> getAllCategories();
 }

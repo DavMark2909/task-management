@@ -10,4 +10,5 @@ public class ItemDto {
     private String type;
     private String measurement;
     private double quantity;
+    private double price;
 }

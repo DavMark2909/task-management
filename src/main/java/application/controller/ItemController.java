@@ -33,7 +33,7 @@ public class ItemController {
 
     @PostMapping("/createType")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Void> createType(@RequestBody CreateTypeDto dto) throws MyException {
+    public ResponseEntity<?> createType(@RequestBody CreateTypeDto dto) throws MyException {
         itemService.createType(dto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
