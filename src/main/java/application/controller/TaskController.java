@@ -1,5 +1,6 @@
 package application.controller;
 
+import application.dto.feign.FeignMessage;
 import application.dto.request.IssuedRequestsDto;
 import application.dto.request.RequestDto;
 import application.dto.request.TaskCommentDto;

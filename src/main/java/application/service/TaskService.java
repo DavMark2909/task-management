@@ -1,5 +1,6 @@
 package application.service;
 
+import application.dto.feign.FeignMessage;
 import application.dto.request.*;
 import application.dto.task.*;
 import application.entity.*;
@@ -13,8 +14,10 @@ import application.entity.task.Task;
 import application.entity.task.TaskComment;
 import application.entity.task.TaskStatus;
 import application.exception.MyException;
+import application.feign.MessagerProxy;
 import application.repository.*;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,19 +40,25 @@ public class TaskService {
     private TaskStatusRepository taskStatusRepository;
     private MessageService messageService;
     private TaskCommentRepository taskCommentRepository;
+    private MessagerProxy feignProxyClient;
 
     public List<String> getAllRoles(){
         return roleService.getAllRoles();
     }
 
-    @Transactional
+
     public void createTask(CreateTaskDto dto, String username){
-        if (dto.isPersonal())
+        if (dto.isPersonal()) {
             createPersonalTask(dto, username);
+            String content = "You were assigned with a new task: " + dto.getDescription();
+            System.out.println(content);
+            feignProxyClient.sendSystemMessage(new FeignMessage(dto.getReceivers().get(0), content));
+        }
         else
             createGroupTask(dto, username);
     }
 
+    @Transactional
     private void createPersonalTask(CreateTaskDto dto, String username){
         User issuer = userService.getRealUserByUsername(username);
         TaskStatus status = taskStatusRepository.findByName("active").orElseGet(() -> {
@@ -76,6 +85,7 @@ public class TaskService {
         }).collect(Collectors.toSet());
     }
 
+    @Transactional
     private void createGroupTask(CreateTaskDto dto, String username){
         User issuer = userService.getRealUserByUsername(username);
         Set<User> receivers = new HashSet<>(userService.getUserByRole(dto.getReceivers().get(0)));
