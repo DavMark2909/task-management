@@ -4,8 +4,6 @@ import application.dto.feign.FeignMessage;
 import application.dto.request.*;
 import application.dto.task.*;
 import application.entity.*;
-import application.entity.chat.ChatRoom;
-import application.entity.chat.Message;
 import application.entity.request.Request;
 import application.entity.request.RequestComment;
 import application.entity.request.RequestStatus;
@@ -38,7 +36,6 @@ public class TaskService {
     private RequestStatusRepository requestStatusRepository;
     private RequestRepository requestRepository;
     private TaskStatusRepository taskStatusRepository;
-    private MessageService messageService;
     private TaskCommentRepository taskCommentRepository;
     private MessagerProxy feignProxyClient;
 
@@ -211,22 +208,6 @@ public class TaskService {
         return requestRepository.getRequestByIssuer(username).stream().map(RequestConverter::convertToIssuedRequests).toList();
     }
 
-    public void setMessage(String message, boolean requestBased, Set<ChatRoom> chats, String username){
-        for (ChatRoom ch : chats){
-            if (ch.isSystematic()){
-                Message msg = new Message();
-                msg.setChat(ch);
-                msg.setContent(message);
-                msg.setRequestBased(requestBased);
-                msg.setUsername(username);
-                Message saveMessage = messageService.saveMessage(msg);
-                List<Message> messages = ch.getMessages();
-                messages.add(saveMessage);
-                messageService.saveRoom(ch);
-            }
-        }
-    }
-
     public Request updateRequest(int id, String newState){
         Request request = requestRepository.findById(id).orElseThrow();
         RequestStatus status = requestStatusRepository.findByName(newState).orElseGet(() -> {
@@ -242,19 +223,20 @@ public class TaskService {
     public void updateRequestWithMessage(int id, String message, String username, String newState){
         Request request = updateRequest(id, newState);
         String msg = "Your request " + String.valueOf(id) + " was updated";
-        setMessage(msg, false, request.getIssuer().getChats(), username);
         RequestComment comment = new RequestComment();
         comment.setComment(message);
         comment.setCommentator(username);
         comment.setRequest(request);
         request.getComments();
+        //TODO: send message to the messager
     }
 
     public void updateRequestWithoutMessage(int id, String username, String newState){
         Request request = updateRequest(id, newState);
         String msg = "Your request " + String.valueOf(id) + " was updated";
-        setMessage(msg, true, request.getIssuer().getChats(), username);
+        //TODO: send message to the messager
     }
+
 
     public void requestProceed(UpdateRequestDto dto, String username){
         if (dto.getMessage().equals(""))

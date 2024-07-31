@@ -1,7 +1,6 @@
 package application.entity;
 
 
-import application.entity.chat.ChatRoom;
 import application.entity.request.Request;
 import application.entity.task.Task;
 import jakarta.persistence.*;
@@ -29,7 +28,8 @@ public class User {
     private String password;
 
 //    will be used for the track of a chat room with system notifications
-    private int app_id;
+    @Column(name="chat_id")
+    private int chatId;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -48,12 +48,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "request_id"))
     private Set<Request> requests;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_rooms",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id"))
-    private Set<ChatRoom> chats;
 
     @OneToMany(mappedBy = "issuer")
     private Set<Task> issuedTasks;
