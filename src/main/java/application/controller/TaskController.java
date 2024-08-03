@@ -7,6 +7,7 @@ import application.dto.request.TaskCommentDto;
 import application.dto.request.UserRequestsDto;
 import application.dto.task.*;
 import application.exception.MyException;
+import application.rabbitmq.RabbitMQProducer;
 import application.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -13,6 +13,7 @@ import application.entity.task.TaskComment;
 import application.entity.task.TaskStatus;
 import application.exception.MyException;
 import application.feign.MessagerProxy;
+import application.rabbitmq.RabbitMQProducer;
 import application.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class TaskService {
     private TaskStatusRepository taskStatusRepository;
     private TaskCommentRepository taskCommentRepository;
     private MessagerProxy feignProxyClient;
+    private RabbitMQProducer rabbitProducer;
 
     public List<String> getAllRoles(){
         return roleService.getAllRoles();
@@ -49,7 +51,8 @@ public class TaskService {
             createPersonalTask(dto, username);
             String content = "You were assigned with a new task: " + dto.getDescription();
             System.out.println(content);
-            feignProxyClient.sendSystemMessage(new FeignMessage(dto.getReceivers().get(0), content));
+//            feignProxyClient.sendSystemMessage(new FeignMessage(dto.getReceivers().get(0), content));
+            rabbitProducer.sendTaskMessage(new FeignMessage(dto.getReceivers().get(0), content));
         }
         else
             createGroupTask(dto, username);
