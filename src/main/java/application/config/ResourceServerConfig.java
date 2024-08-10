@@ -27,18 +27,18 @@ public class ResourceServerConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
 
-        http.cors(c -> {
-            CorsConfigurationSource source = s -> {
-                CorsConfiguration cc = new CorsConfiguration();
-                cc.setAllowCredentials(true);
-                cc.setAllowedOrigins(List.of("http://127.0.0.1:3000"));
-                cc.setAllowedHeaders(List.of("*"));
-                cc.setAllowedMethods(List.of("*"));
-                return cc;
-            };
-
-            c.configurationSource(source);
-        });
+//        http.cors(c -> {
+//            CorsConfigurationSource source = s -> {
+//                CorsConfiguration cc = new CorsConfiguration();
+//                cc.setAllowCredentials(true);
+//                cc.setAllowedOrigins(List.of("http://127.0.0.1:3000"));
+//                cc.setAllowedHeaders(List.of("*"));
+//                cc.setAllowedMethods(List.of("*"));
+//                return cc;
+//            };
+//
+//            c.configurationSource(source);
+//        });
         http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(JwtDecoders.fromIssuerLocation(issuerUri))));
