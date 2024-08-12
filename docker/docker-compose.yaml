@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: db
+    image: mysql
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      MYSQL_DATABASE: app
+      MYSQL_ROOT_PASSWORD: secret_password
+    ports:
+      - "3307:3306"
+#    volumes:
+#      - fund_data:/var/lib/mysql
+    networks:
+      - test1
+
+  main-app:
+    container_name: main-app
+    image: dauleti/dillfund_task-management:1.0-SNAPSHOT
+    ports:
+      - "8080:8080"
+    networks:
+      - test1
+    depends_on:
+      - naming-server
+      - auth-server
+      - gateway
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/app
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: secret_password
+      SPRING.SECURITY.OAUTH2.RESOURCESERVER.JWT.ISSUER-URI: http://gateway:8765/authorization-server
+
+
+  auth-server:
+    container_name: auth-server
+    image: dauleti/dillfund_authorization-server-task-management:1.0-SNAPSHOT
+    ports:
+      - "9000:9000"
+    networks:
+      - test1
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/app
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: secret_password
+
+  gateway:
+    container_name: gateway
+    image: dauleti/dillfund_gateway-v1:1.0-SNAPSHOT
+    ports:
+      - "8765:8765"
+    networks:
+      - test1
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://gateway:8765/authorization-server" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  naming-server:
+    container_name: eureka
+    image: dauleti/dillfund_naming-server:1.0-SNAPSHOT
+    ports:
+      - "8761:8761"
+    networks:
+      - test1
+
+
+networks:
+  test1:
